@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  rlpackman:
+    image: rlpackman
+    build:
+      context: .
+      dockerfile: ./Dockerfile
