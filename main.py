@@ -56,31 +56,31 @@ world = load_level(level)
 for row in world:
     print(row)
 
-# pygame.init()
-# clock = pygame.time.Clock()
-# screenwidth, screenheight = (480, 600)
-# screen = pygame.display.set_mode((screenwidth, screenheight))
+pygame.init()
+clock = pygame.time.Clock()
+screenwidth, screenheight = (480, 600)
+screen = pygame.display.set_mode((screenwidth, screenheight))
 
-# framerate = 60
-# bg_speed = 100
+framerate = 60
+bg_speed = 100
 
-# background = ScrollingBackground(screenheight, os.path.join('./backgrounds', 'space_bg.jpg'))
-# player = Player(screenheight, screenwidth, os.path.join('./sprites', 'pacman.png'))
+background = ScrollingBackground(screenheight, os.path.join('./backgrounds', 'space_bg.jpg'))
+player = Player(screenheight, screenwidth, os.path.join('./sprites', 'pacman.png'))
 
-# pygame.mouse.set_visible(0)
-# pygame.display.set_caption('Pacman')
+pygame.mouse.set_visible(0)
+pygame.display.set_caption('Pacman')
 
-# while True:
-#     time = clock.tick(framerate)/1000.0
-#     x, y = pygame.mouse.get_pos()
-#     player.update_coords(x)
-#     player.show(screen)
-#     for event in pygame.event.get():
-#         if event.type == pygame.QUIT:
-#             print("Exiting...")
-#             sys.exit()
+while True:
+    time = clock.tick(framerate)/1000.0
+    x, y = pygame.mouse.get_pos()
+    player.update_coords(x)
+    player.show(screen)
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            print("Exiting...")
+            sys.exit()
     
     
-#     background.update_coords(bg_speed, time)
-#     background.show(screen)
-#     pygame.display.update()
+    background.update_coords(bg_speed, time)
+    background.show(screen)
+    pygame.display.update()
