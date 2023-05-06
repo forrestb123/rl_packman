@@ -60,6 +60,16 @@ class Value(nn.Module):
     def forward(self, x):
         return self.net(x)
 
+def test(env, policy):
+    state = env.reset()
+    done = False
+    total_reward = 0
+    while not done:
+        action, _ = get_action(policy, state)
+        state, reward, done, _ = env.step(action)
+        total_reward += reward
+    return total_reward
+
 def calc_return(memory, rollout, gamma):
     run_return = 0
     for i, transition in enumerate(reversed(rollout)):
@@ -76,6 +86,7 @@ def get_action(network, state):
         return sel_action, action_dist
     
 def learn(optim, policy, value, memory_dataloader, episilon, epochs):
+    #Add modifier for epsilion in certain conditions
     policy_losses = []
     val_losses = []
     criterion = nn.MSE_Loss()

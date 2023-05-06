@@ -3,17 +3,19 @@ import sys
 import os
 from pygame.locals import *
 
-WORLD_SIZE = 20
+WORLD_HEIGHT = 31
+WORLD_WIDTH = 28
 BLOCK_SIZE = 32
-WIDTH = WORLD_SIZE * BLOCK_SIZE
-HEIGHT = WORLD_SIZE * BLOCK_SIZE
+PLAYER_SIZE = 20
+WIDTH = WORLD_WIDTH * BLOCK_SIZE
+HEIGHT = WORLD_HEIGHT * BLOCK_SIZE
 SPEED = 2
 
 COLOR = (255, 100, 98)
 SURFACE_COLOR = (0, 0, 0)
 # WIDTH = 500
 # HEIGHT = 500
-NUM_GHOSTS = 3
+NUM_GHOSTS = 4
 
 char_to_image = {
     '.' : "dot.png",
@@ -25,33 +27,16 @@ char_to_image = {
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, color, height, width):
+    def __init__(self, color, height, width, ghost=False):
         super().__init__()
-    
+        self.is_ghost = ghost
+        self.score = 0
         self.image = pygame.Surface([width, height])
         self.image.fill(SURFACE_COLOR)
         self.image.set_colorkey(COLOR)
 
         pygame.draw.rect(self.image, color, pygame.Rect(0, 0, width, height))
         self.rect = self.image.get_rect()
-
-    def move_right(self, pixels):
-        self.rect.x += pixels
-    
-    def move_left(self, pixels):
-        self.rect.x -= pixels
-
-    # def move_forward(self, speed):
-    #     self.rect.y += speed * speed/10
-    
-    # def move_backward(self, speed):
-    #     self.rect.y -= speed * speed/10
-
-    def move_up(self, pixels):
-        self.rect.y += pixels
-
-    def move_down(self, pixels):
-        self.rect.y -= pixels
 
     def move(self, dx, dy, sprites):
         if dx != 0:
@@ -65,7 +50,7 @@ class Player(pygame.sprite.Sprite):
 
         for sprite in sprites:
             if self.rect.colliderect(sprite.rect):
-                if sprite.type == '=':
+                if sprite.type == '=' or sprite.type == '-':
                     if dx > 0:
                         self.rect.right = sprite.rect.left
                     if dx < 0:
@@ -74,11 +59,11 @@ class Player(pygame.sprite.Sprite):
                         self.rect.bottom = sprite.rect.top
                     if dy < 0:
                         self.rect.top = sprite.rect.bottom
-                if sprite.type == '.':
+                if sprite.type == '.' and not self.is_ghost:
+                    self.score += 1
                     sprite.kill()
-                if sprite.type == '*':
-                    sprites.remove(sprite)
-
+                if sprite.type == '*' and not self.is_ghost:
+                    sprite.kill()
 
 class Sprite(pygame.sprite.Sprite):
     def __init__(self, color, height, width, type):
@@ -114,7 +99,9 @@ def draw_world(world):
             elif block == '=':
                 color = (0, 0, 255)
             elif block == '*':
-                color = (255, 0, 0)
+                color = (0, 255, 0)
+            elif block == '-':
+                color = (255, 128, 0)
             sprite = Sprite(color, size[0], size[1], block)
             sprite.rect.x = x * BLOCK_SIZE
             sprite.rect.y = y * BLOCK_SIZE
@@ -122,7 +109,7 @@ def draw_world(world):
     return sprites
 
 
-level = 1
+level = 0
 world = load_level(level)
 for row in world:
     print(row)
@@ -130,19 +117,25 @@ for row in world:
 pygame.init()
 pygame.display.set_caption("Packman")
 
-speed = 10
+speed = 8
 clock = pygame.time.Clock()
 size = (WIDTH, HEIGHT)
 screen = pygame.display.set_mode(size)
 
 all_sprites_list = pygame.sprite.Group()
-sprites= draw_world(world)
-pacman = Player((255, 255, 0), BLOCK_SIZE*0.75, BLOCK_SIZE*0.75)
-pacman.rect.x = WIDTH // 2 - BLOCK_SIZE 
-pacman.rect.y = HEIGHT // 2
+sprites = draw_world(world)
+pacman = Player((255, 255, 0), PLAYER_SIZE, PLAYER_SIZE)
+pacman.rect.x = WIDTH // 2 
+pacman.rect.y = HEIGHT // 2 + 1.5 * BLOCK_SIZE
+
+ghosts = [Player((255, 0, 0), PLAYER_SIZE, PLAYER_SIZE, True) for _ in range(NUM_GHOSTS)]
+for i, ghost in enumerate(ghosts):
+    ghost.rect.x = WIDTH // 2 - (i - 1) * BLOCK_SIZE
+    ghost.rect.y = HEIGHT // 2 - 1.5 * BLOCK_SIZE
 
 all_sprites_list.add(sprites)
 all_sprites_list.add(pacman)
+all_sprites_list.add(ghosts)
 
 exit = False
 
