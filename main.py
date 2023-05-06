@@ -155,6 +155,12 @@ while not exit:
             if event.key == pygame.K_x:
                 exit = True
 
+    for ghost in ghosts:
+        if pygame.sprite.collide_rect(pacman, ghost):
+            # TODO: Implement game over message
+            print("Game Over")
+            exit = True
+
     key = pygame.key.get_pressed()
     if key[pygame.K_LEFT]:
         pacman.move(-speed, 0, sprites)
