@@ -25,18 +25,22 @@ char_to_image = {
     'G' : "ghost2.png",
 }
 
-
-class Player(pygame.sprite.Sprite):
-    def __init__(self, color, height, width, ghost=False):
+class Sprite(pygame.sprite.Sprite):
+    def __init__(self, color, height, width, type):
         super().__init__()
-        self.is_ghost = ghost
-        self.score = 0
+        self.type = type
         self.image = pygame.Surface([width, height])
         self.image.fill(SURFACE_COLOR)
         self.image.set_colorkey(COLOR)
 
         pygame.draw.rect(self.image, color, pygame.Rect(0, 0, width, height))
         self.rect = self.image.get_rect()
+
+class Player(Sprite):
+    def __init__(self, color, height, width):
+        super().__init__(color, height, width, 'P')
+        self.is_ghost = False
+        self.score = 0
 
     def move(self, dx, dy, sprites):
         if dx != 0:
@@ -65,17 +69,20 @@ class Player(pygame.sprite.Sprite):
                 if sprite.type == '*' and not self.is_ghost:
                     sprite.kill()
 
-class Sprite(pygame.sprite.Sprite):
-    def __init__(self, color, height, width, type):
-        super().__init__()
-        self.type = type
-        self.image = pygame.Surface([width, height])
-        self.image.fill(SURFACE_COLOR)
-        self.image.set_colorkey(COLOR)
+class Ghost(Player):
+    def __init__(self, color, height, width, ghost_type):
+        super().__init__(color, height, width)
+        self.is_ghost = True
+        self.ghost_type = ghost_type
 
-        pygame.draw.rect(self.image, color, pygame.Rect(0, 0, width, height))
-        self.rect = self.image.get_rect()
+    def chase():
+        # TODO: Implement chase mechanism for each ghost
+        pass
 
+    def scatter():
+        # TODO: Implement scatter mechanism for each ghost
+        pass
+    
 def load_level(number):
     world = []
     file = os.path.join('./levels', 'level' + str(number) + '.txt')
@@ -128,7 +135,7 @@ pacman = Player((255, 255, 0), PLAYER_SIZE, PLAYER_SIZE)
 pacman.rect.x = WIDTH // 2 
 pacman.rect.y = HEIGHT // 2 + 1.5 * BLOCK_SIZE
 
-ghosts = [Player((255, 0, 0), PLAYER_SIZE, PLAYER_SIZE, True) for _ in range(NUM_GHOSTS)]
+ghosts = [Ghost((255, 0, 0), PLAYER_SIZE, PLAYER_SIZE, i) for i in range(NUM_GHOSTS)]
 for i, ghost in enumerate(ghosts):
     ghost.rect.x = WIDTH // 2 - (i - 1) * BLOCK_SIZE
     ghost.rect.y = HEIGHT // 2 - 1.5 * BLOCK_SIZE
